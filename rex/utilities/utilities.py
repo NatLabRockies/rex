@@ -987,7 +987,7 @@ def get_dtype(col):
     elif is_bool_dtype(dtype):
         out = bool
     elif is_string_dtype(dtype) or is_object_dtype(dtype):
-        size = int(col.astype(str).str.len().max())
+        size = max((len(str(value)) for value in col), default=1)
         out = 'S{:}'.format(size)
     else:
         out = getattr(dtype, 'numpy_dtype', dtype)
@@ -1015,7 +1015,7 @@ def to_records_array(df):
         dtype = get_dtype(c_data)
 
         if np.issubdtype(dtype, np.bytes_):
-            data = c_data.astype(str).str.encode('utf-8').values
+            data = c_data.map(str).str.encode('utf-8').values
         else:
             data = c_data.values
 
