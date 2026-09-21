@@ -120,6 +120,19 @@ def test_to_records_array_string_dtype():
     assert np.all(test['gid'] == np.array([1, 2], dtype=np.int16))
 
 
+def test_to_records_array_missing_strings():
+    """Test missing object values are stringified for records arrays."""
+    meta = pd.DataFrame({
+        'all_missing': pd.Series([None, None], dtype=object),
+        'mixed': pd.Series(['alpha', None], dtype=object),
+    })
+
+    test = to_records_array(meta)
+
+    assert np.all(test['all_missing'] == np.array([b'None', b'None']))
+    assert np.all(test['mixed'] == np.array([b'alpha', b'None']))
+
+
 @pytest.mark.parametrize('t_chunk', [None, 8 * 7 * 24])
 def test_chunks(t_chunk):
     """
